@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlook Hotel - Système de Réservation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Main Content Areas */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        /* Calendar */
+        .calendar-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .calendar-day:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .calendar-day.selected {
+            background: #28a745;
+            color: white;
+        }
+
+        .calendar-day.disabled {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .day-header {
+            font-weight: bold;
+            color: #495057;
+            background: #e9ecef !important;
+            cursor: default;
+        }
+
+        /* Chambres Grid */
+        .chambres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chambre-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .chambre-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .chambre-card.selected {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .chambre-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .chambre-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .chambre-type {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-confirmee { background: #d4edda; color: #155724; }
+        .status-annulee { background: #f8d7da; color: #721c24; }
+        .status-terminee { background: #d1ecf1; color: #0c5460; }
+
+        /* Action buttons */
+        .btn-sm {
+            padding: 8px 15px;
+            margin: 2px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Alert messages */
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Hidden sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .auth-container {
+                margin: 20px auto;
+                padding: 20px;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                flex: none;
+                min-width: 120px;
+            }
+            
+            .chambres-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Zone d'authentification -->
+    <div id="auth-section" class="section active">
+        <div class="auth-container">
+            <h1 style="text-align: center; margin-bottom: 30px; color: #333;">Overlook Hotel</h1>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('client')">Client</button>
+                <button class="auth-tab" onclick="switchAuthTab('gestionnaire')">Gestionnaire</button>
+            </div>
+
+            <!-- Formulaire Client -->
+            <div id="client-auth" class="auth-form">
+                <div class="auth-tabs" style="margin-top: 20px;">
+                    <button class="auth-tab active" onclick="switchClientMode('login')">Connexion</button>
+                    <button class="auth-tab" onclick="switchClientMode('register')">Inscription</button>
+                </div>
+
+                <!-- Login Client -->
+                <form id="client-login-form" class="auth-subform">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="client-login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="client-login-password" required>
+                    </div>
+                    <button type="submit" class="btn">Se connecter</button>
+                </form>
+
+                <!-- Register Client -->
+                <form id="client-register-form" class="auth-subform" style="display: none;">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" id="client-register-nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" id="client-register-prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="client-register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" id="client-register-telephone">
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="client-register-password" minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn">S'inscrire</button>
+                </form>
+            </div>
+
+            <!-- Formulaire Gestionnaire -->
+            <div id="gestionnaire-auth" class="auth-form" style="display: none;">
+                <form id="gestionnaire-login-form">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="gestionnaire-login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="gestionnaire-login-password" required>
+                    </div>
+                    <button type="submit" class="btn">Se connecter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zone Client -->
+    <div id="client-section" class="section">
+        <div class="container">
+            <div class="header">
+                <h1>Overlook Hotel</h1>
+                <div class="user-info">
+                    <span class="welcome-text" id="client-welcome">Bienvenue</span>
+                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchClientTab('reservation')">Réservation</button>
+                    <button class="nav-tab" onclick="switchClientTab('history')">Mes Réservations</button>
+                    <button class="nav-tab" onclick="switchClientTab('feedback')">Mes Avis</button>
+                </div>
+
+                <!-- Réservation -->
+                <div id="client-reservation" class="tab-content">
+                    <h2 style="margin-bottom: 20px;">Réserver une chambre</h2>
+                    
+                    <div class="calendar-container">
+                        <h3>Sélectionnez vos dates</h3>
+                        <div class="calendar-header">
+                            <button class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+                            <h4 id="current-month"></h4>
+                            <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid"></div>
+                        <div style="margin-top: 15px;">
+                            <strong>Dates sélectionnées:</strong>
+                            <span id="selected-dates">Aucune date sélectionnée</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>Chambres disponibles</h3>
+                        <div class="chambres-grid" id="chambres-disponibles">
+                            <!-- Les chambres seront chargées dynamiquement -->
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="confirmerReservation()" style="margin-top: 20px;">Confirmer la réservation</button>
+                </div>
+
+                <!-- Historique des réservations -->
+                <div id="client-history" class="tab-content" style="display: none;">
+                    <h2>Mes réservations</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Chambre</th>
+                                    <th>Dates</th>
+                                    <th>Prix total</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="client-reservations-tbody">
+                                <!-- Réservations chargées dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="client-feedback" class="tab-content" style="display: none;">
+                    <h2>Mes avis</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Réservation</th>
+                                    <th>Note</th>
+                                    <th>Commentaire</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="client-feedback-tbody">
+                                <!-- Feedbacks chargés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zone Gestionnaire -->
+    <div id="gestionnaire-section" class="section">
+        <div class="container">
+            <div class="header">
+                <h1>Dashboard Gestionnaire</h1>
+                <div class="user-info">
+                    <span class="welcome-text" id="gestionnaire-welcome">Bienvenue</span>
+                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Statistiques -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-reservations">0</div>
+                        <div class="stat-label">Réservations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-chambres">0</div>
+                        <div class="stat-label">Chambres</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-clients">0</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avg-rating">0</div>
+                        <div class="stat-label">Note moyenne</div>
+                    </div>
+                </div>
+
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchGestionnaireTab('reservations')">Réservations</button>
+                    <button class="nav-tab" onclick="switchGestionnaireTab('chambres')">Chambres</button>
+                    <button class="nav-tab" onclick="switchGestionnaireTab('feedbacks')">Feedbacks</button>
+                    <button class="nav-tab" onclick="switchGestionnaireTab('clients')">Clients</button>
+                </div>
+
+                <!-- Gestion des réservations -->
+                <div id="gestionnaire-reservations" class="tab-content">
+                    <h2>Gestion des réservations</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Client</th>
+                                    <th>Chambre</th>
+                                    <th>Dates</th>
+                                    <th>Prix</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gestionnaire-reservations-tbody">
+                                <!-- Réservations chargées dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gestion des chambres -->
+                <div id="gestionnaire-chambres" class="tab-content" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Gestion des chambres</h2>
+                        <button class="btn" onclick="openChambreModal()" style="width: auto; padding: 10px 20px;">Ajouter une chambre</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Type</th>
+                                    <th>Prix/nuit</th>
+                                    <th>Disponible</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gestionnaire-chambres-tbody">
+                                <!-- Chambres chargées dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gestion des feedbacks -->
+                <div id="gestionnaire-feedbacks" class="tab-content" style="display: none;">
+                    <h2>Gestion des avis clients</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Réservation</th>
+                                    <th>Note</th>
+                                    <th>Commentaire</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gestionnaire-feedbacks-tbody">
+                                <!-- Feedbacks chargés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gestion des clients -->
+                <div id="gestionnaire-clients" class="tab-content" style="display: none;">
+                    <h2>Gestion des clients</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Points fidélité</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gestionnaire-clients-tbody">
+                                <!-- Clients chargés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier chambre -->
+    <div id="chambre-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="chambre-modal-title">Ajouter une chambre</h3>
+                <button class="modal-close" onclick="closeChambreModal()">×</button>
+            </div>
+            <form id="chambre-form">
+                <div class="form-group">
+                    <label>Numéro</label>
+                    <input type="text" id="chambre-numero" required>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="chambre-type" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Présidentielle">Présidentielle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prix par nuit (€)</label>
+                    <input type="number" id="chambre-prix" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="chambre-disponible" checked>
+                        Disponible
+                    </label>
+                </div>
+                <button type="submit" class="btn">Sauvegarder</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alertes -->
+    <div id="alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
+
+    <script>
+        // Configuration API
+        const API_BASE = 'http://localhost:8080/api';
+        
+        // Variables globales
+        let currentUser = null;
+        let userRole = null;
+        let authToken = null;
+        let selectedDates = [];
+        let selectedChambre = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let editingChambre = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            generateCalendar();
+        });
+
+        function initializeApp() {
+            // Vérifier si l'utilisateur est déjà connecté
+            const savedUser = localStorage.getItem('currentUser');
+            const savedToken = localStorage.getItem('authToken');
+            const savedRole = localStorage.getItem('userRole');
+            
+            if (savedUser && savedToken && savedRole) {
+                currentUser = JSON.parse(savedUser);
+                authToken = savedToken;
+                userRole = savedRole;
+                
+                if (userRole === 'client') {
+                    showClientSection();
+                } else if (userRole === 'gestionnaire') {
+                    showGestionnaireSection();
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            // Formulaires d'authentification
+            document.getElementById('client-login-form').addEventListener('submit', handleClientLogin);
+            document.getElementById('client-register-form').addEventListener('submit', handleClientRegister);
+            document.getElementById('gestionnaire-login-form').addEventListener('submit', handleGestionnaireLogin);
+            document.getElementById('chambre-form').addEventListener('submit', handleChambreForm);
+        }
+
+        // Fonctions d'authentification
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-auth').style.display = 'block';
+        }
+
+        function switchClientMode(mode) {
+            const tabs = document.querySelectorAll('#client-auth .auth-tab');
+            const forms = document.querySelectorAll('#client-auth .auth-subform');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById('client-' + mode + '-form').style.display = 'block';
+        }
+
+        async function handleClientLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('client-login-email').value;
+            const password = document.getElementById('client-login-password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, motDePasse: password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.role === 'client') {
+                    currentUser = data;
+                    authToken = data.token;
+                    userRole = 'client';
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(data));
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userRole', 'client');
+                    
+                    showAlert('Connexion réussie!', 'success');
+                    showClientSection();
+                } else {
+                    showAlert('Email ou mot de passe incorrect', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion', 'danger');
+            }
+        }
+
+        async function handleClientRegister(e) {
+            e.preventDefault();
+            const formData = {
+                nom: document.getElementById('client-register-nom').value,
+                prenom: document.getElementById('client-register-prenom').value,
+                email: document.getElementById('client-register-email').value,
+                telephone: document.getElementById('client-register-telephone').value,
+                motDePasse: document.getElementById('client-register-password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data;
+                    authToken = data.token;
+                    userRole = 'client';
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(data));
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userRole', 'client');
+                    
+                    showAlert('Inscription réussie!', 'success');
+                    showClientSection();
+                } else {
+                    showAlert(data.message || 'Erreur lors de l\'inscription', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de l\'inscription', 'danger');
+            }
+        }
+
+        async function handleGestionnaireLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('gestionnaire-login-email').value;
+            const password = document.getElementById('gestionnaire-login-password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/gestionnaires/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, motDePasse: password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data;
+                    userRole = 'gestionnaire';
+                    authToken = 'bearer_token_' + data.idGestionnaire; // Token simulé
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(data));
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userRole', 'gestionnaire');
+                    
+                    showAlert('Connexion réussie!', 'success');
+                    showGestionnaireSection();
+                } else {
+                    showAlert('Email ou mot de passe incorrect', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur de connexion', 'danger');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            authToken = null;
+            userRole = null;
+            
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            
+            // Reset forms
+            document.querySelectorAll('form').forEach(form => form.reset());
+            selectedDates = [];
+            selectedChambre = null;
+            
+            // Show auth section
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('auth-section').classList.add('active');
+            
+            showAlert('Déconnexion réussie', 'info');
+        }
+
+        // Fonctions d'interface client
+        function showClientSection() {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('client-section').classList.add('active');
+            document.getElementById('client-welcome').textContent = `Bienvenue, ${currentUser.prenom} ${currentUser.nom}`;
+            loadChambresDisponibles();
+            loadClientReservations();
+            loadClientFeedbacks();
+        }
+
+        function switchClientTab(tab) {
+            document.querySelectorAll('#client-section .nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#client-section .tab-content').forEach(c => c.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById('client-' + tab).style.display = 'block';
+            
+            if (tab === 'reservation') {
+                loadChambresDisponibles();
+            }
+        }
+
+        // Fonctions d'interface gestionnaire
+        function showGestionnaireSection() {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('gestionnaire-section').classList.add('active');
+            document.getElementById('gestionnaire-welcome').textContent = `Bienvenue, ${currentUser.prenom} ${currentUser.nom}`;
+            loadDashboardStats();
+            loadGestionnaireReservations();
+            loadGestionnaireChambres();
+            loadGestionnaireFeedbacks();
+            loadGestionnaireClients();
+        }
+
+        function switchGestionnaireTab(tab) {
+            document.querySelectorAll('#gestionnaire-section .nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#gestionnaire-section .tab-content').forEach(c => c.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById('gestionnaire-' + tab).style.display = 'block';
+        }
+
+        // Fonctions du calendrier
+        function generateCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            // Headers des jours
+            const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            days.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day day-header';
+                dayElement.textContent = day;
+                grid.appendChild(dayElement);
+            });
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const today = new Date();
+
+            // Jours vides avant le premier jour du mois
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                grid.appendChild(emptyDay);
+            }
+
+            // Jours du mois
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const currentDate = new Date(currentYear, currentMonth, day);
+                const dateString = currentDate.toISOString().split('T')[0];
+                
+                // Désactiver les dates passées
+                if (currentDate < today.setHours(0,0,0,0)) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    dayElement.addEventListener('click', () => selectDate(dateString, dayElement));
+                }
+                
+                // Marquer les dates sélectionnées
+                if (selectedDates.includes(dateString)) {
+                    dayElement.classList.add('selected');
+                }
+                
+                grid.appendChild(dayElement);
+            }
+
+            // Mettre à jour le titre du mois
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                              'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            document.getElementById('current-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar();
+        }
+
+        function selectDate(dateString, element) {
+            if (element.classList.contains('disabled')) return;
+            
+            if (selectedDates.includes(dateString)) {
+                selectedDates = selectedDates.filter(d => d !== dateString);
+                element.classList.remove('selected');
+            } else if (selectedDates.length < 2) {
+                selectedDates.push(dateString);
+                element.classList.add('selected');
+            } else {
+                // Si déjà 2 dates, remplacer la première
+                const oldDate = selectedDates.shift();
+                document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                    if (!selectedDates.includes(el.textContent)) {
+                        el.classList.remove('selected');
+                    }
+                });
+                selectedDates.push(dateString);
+                element.classList.add('selected');
+            }
+            
+            updateSelectedDatesDisplay();
+            loadChambresDisponibles();
+        }
+
+        function updateSelectedDatesDisplay() {
+            const display = document.getElementById('selected-dates');
+            if (selectedDates.length === 0) {
+                display.textContent = 'Aucune date sélectionnée';
+            } else if (selectedDates.length === 1) {
+                display.textContent = `Date sélectionnée: ${formatDate(selectedDates[0])}`;
+            } else {
+                const sortedDates = selectedDates.sort();
+                display.textContent = `Du ${formatDate(sortedDates[0])} au ${formatDate(sortedDates[1])}`;
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString + 'T00:00:00').toLocaleDateString('fr-FR');
+        }
+
+        // Fonctions de chargement des données
+        async function loadChambresDisponibles() {
+            try {
+                const response = await fetch(`${API_BASE}/chambres/disponibles`);
+                const chambres = await response.json();
+                
+                const container = document.getElementById('chambres-disponibles');
+                container.innerHTML = '';
+                
+                chambres.forEach(chambre => {
+                    const chambreCard = document.createElement('div');
+                    chambreCard.className = 'chambre-card';
+                    chambreCard.onclick = () => selectChambre(chambre, chambreCard);
+                    
+                    chambreCard.innerHTML = `
+                        <div class="chambre-info">
+                            <h3>Chambre ${chambre.numero}</h3>
+                            <div class="chambre-type">${chambre.type}</div>
+                            <div class="chambre-price">${chambre.prixNuit}€/nuit</div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(chambreCard);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des chambres', 'danger');
+            }
+        }
+
+        function selectChambre(chambre, element) {
+            document.querySelectorAll('.chambre-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedChambre = chambre;
+        }
+
+        async function confirmerReservation() {
+            if (selectedDates.length !== 2) {
+                showAlert('Veuillez sélectionner une date de début et de fin', 'danger');
+                return;
+            }
+            
+            if (!selectedChambre) {
+                showAlert('Veuillez sélectionner une chambre', 'danger');
+                return;
+            }
+
+            const sortedDates = selectedDates.sort();
+            const dateDebut = sortedDates[0];
+            const dateFin = sortedDates[1];
+            
+            const debut = new Date(dateDebut);
+            const fin = new Date(dateFin);
+            const nights = (fin - debut) / (1000 * 60 * 60 * 24);
+            const prixTotal = nights * selectedChambre.prixNuit;
+
+            const reservationData = {
+                dateDebut,
+                dateFin,
+                prixTotal,
+                client: { idClient: currentUser.userId },
+                chambre: { idChambre: selectedChambre.idChambre }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/reservations`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(reservationData)
+                });
+
+                if (response.ok) {
+                    showAlert('Réservation confirmée avec succès!', 'success');
+                    selectedDates = [];
+                    selectedChambre = null;
+                    document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+                    document.querySelectorAll('.chambre-card.selected').forEach(el => el.classList.remove('selected'));
+                    updateSelectedDatesDisplay();
+                    loadClientReservations();
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.error || 'Erreur lors de la réservation', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la réservation', 'danger');
+            }
+        }
+
+        async function loadClientReservations() {
+            try {
+                const response = await fetch(`${API_BASE}/reservations`);
+                const allReservations = await response.json();
+                
+                // Filtrer les réservations du client connecté
+                const clientReservations = allReservations.filter(r => 
+                    r.client && r.client.idClient === currentUser.userId
+                );
+                
+                const tbody = document.getElementById('client-reservations-tbody');
+                tbody.innerHTML = '';
+                
+                clientReservations.forEach(reservation => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Chambre ${reservation.chambre.numero}</td>
+                        <td>${formatDate(reservation.dateDebut)} - ${formatDate(reservation.dateFin)}</td>
+                        <td>${reservation.prixTotal}€</td>
+                        <td><span class="status-badge status-${reservation.statut}">${reservation.statut}</span></td>
+                        <td>
+                            ${reservation.statut === 'confirmee' ? 
+                                `<button class="btn-sm btn-danger" onclick="annulerReservation(${reservation.idReservation})">Annuler</button>` : 
+                                ''}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des réservations', 'danger');
+            }
+        }
+
+        async function loadClientFeedbacks() {
+            try {
+                const response = await fetch(`${API_BASE}/feedbacks`);
+                const allFeedbacks = await response.json();
+                
+                // Filtrer les feedbacks du client connecté
+                const clientFeedbacks = allFeedbacks.filter(f => 
+                    f.client && f.client.idClient === currentUser.userId
+                );
+                
+                const tbody = document.getElementById('client-feedback-tbody');
+                tbody.innerHTML = '';
+                
+                clientFeedbacks.forEach(feedback => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Réservation #${feedback.reservation.idReservation}</td>
+                        <td>${feedback.note}/5</td>
+                        <td>${feedback.commentaire || 'Aucun commentaire'}</td>
+                        <td>${formatDate(feedback.dateCreation)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des avis', 'danger');
+            }
+        }
+
+        // Fonctions gestionnaire
+        async function loadDashboardStats() {
+            try {
+                const [reservations, chambres, clients, feedbacks] = await Promise.all([
+                    fetch(`${API_BASE}/reservations`).then(r => r.json()),
+                    fetch(`${API_BASE}/chambres`).then(r => r.json()),
+                    fetch(`${API_BASE}/clients`).then(r => r.json()),
+                    fetch(`${API_BASE}/feedbacks/moyenne`).then(r => r.json())
+                ]);
+
+                document.getElementById('total-reservations').textContent = reservations.length;
+                document.getElementById('total-chambres').textContent = chambres.length;
+                document.getElementById('total-clients').textContent = clients.length;
+                document.getElementById('avg-rating').textContent = feedbacks.toFixed(1);
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des statistiques', 'danger');
+            }
+        }
+
+        async function loadGestionnaireReservations() {
+            try {
+                const response = await fetch(`${API_BASE}/reservations`);
+                const reservations = await response.json();
+                
+                const tbody = document.getElementById('gestionnaire-reservations-tbody');
+                tbody.innerHTML = '';
+                
+                reservations.forEach(reservation => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${reservation.idReservation}</td>
+                        <td>${reservation.client.prenom} ${reservation.client.nom}</td>
+                        <td>Chambre ${reservation.chambre.numero}</td>
+                        <td>${formatDate(reservation.dateDebut)} - ${formatDate(reservation.dateFin)}</td>
+                        <td>${reservation.prixTotal}€</td>
+                        <td><span class="status-badge status-${reservation.statut}">${reservation.statut}</span></td>
+                        <td>
+                            ${reservation.statut === 'confirmee' ? 
+                                `<button class="btn-sm btn-success" onclick="confirmerReservationGest(${reservation.idReservation})">Confirmer</button>
+                                 <button class="btn-sm btn-danger" onclick="annulerReservationGest(${reservation.idReservation})">Annuler</button>` : 
+                                ''}
+                            <button class="btn-sm btn-primary" onclick="terminerReservation(${reservation.idReservation})">Terminer</button>
+                            <button class="btn-sm btn-danger" onclick="supprimerReservation(${reservation.idReservation})">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des réservations', 'danger');
+            }
+        }
+
+        async function loadGestionnaireChambres() {
+            try {
+                const response = await fetch(`${API_BASE}/chambres`);
+                const chambres = await response.json();
+                
+                const tbody = document.getElementById('gestionnaire-chambres-tbody');
+                tbody.innerHTML = '';
+                
+                chambres.forEach(chambre => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${chambre.numero}</td>
+                        <td>${chambre.type}</td>
+                        <td>${chambre.prixNuit}€</td>
+                        <td><span class="status-badge ${chambre.disponible ? 'status-confirmee' : 'status-annulee'}">${chambre.disponible ? 'Oui' : 'Non'}</span></td>
+                        <td>
+                            <button class="btn-sm btn-primary" onclick="editChambre(${chambre.idChambre})">Modifier</button>
+                            <button class="btn-sm btn-warning" onclick="toggleDisponibiliteChambre(${chambre.idChambre}, ${!chambre.disponible})">${chambre.disponible ? 'Désactiver' : 'Activer'}</button>
+                            <button class="btn-sm btn-danger" onclick="supprimerChambre(${chambre.idChambre})">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des chambres', 'danger');
+            }
+        }
+
+        async function loadGestionnaireFeedbacks() {
+            try {
+                const response = await fetch(`${API_BASE}/feedbacks`);
+                const feedbacks = await response.json();
+                
+                const tbody = document.getElementById('gestionnaire-feedbacks-tbody');
+                tbody.innerHTML = '';
+                
+                feedbacks.forEach(feedback => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${feedback.client.prenom} ${feedback.client.nom}</td>
+                        <td>Réservation #${feedback.reservation.idReservation}</td>
+                        <td>${feedback.note}/5</td>
+                        <td>${feedback.commentaire || 'Aucun commentaire'}</td>
+                        <td>${formatDate(feedback.dateCreation)}</td>
+                        <td>
+                            <button class="btn-sm btn-success" onclick="accepterFeedback(${feedback.idFeedback})">Accepter</button>
+                            <button class="btn-sm btn-danger" onclick="supprimerFeedback(${feedback.idFeedback})">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des avis', 'danger');
+            }
+        }
+
+        async function loadGestionnaireClients() {
+            try {
+                const response = await fetch(`${API_BASE}/clients`);
+                const clients = await response.json();
+                
+                const tbody = document.getElementById('gestionnaire-clients-tbody');
+                tbody.innerHTML = '';
+                
+                clients.forEach(client => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${client.nom}</td>
+                        <td>${client.prenom}</td>
+                        <td>${client.email}</td>
+                        <td>${client.telephone || 'N/A'}</td>
+                        <td>${client.points || 0}</td>
+                        <td>
+                            <button class="btn-sm btn-primary" onclick="ajouterPoints(${client.idClient})">Ajouter points</button>
+                            <button class="btn-sm btn-danger" onclick="supprimerClient(${client.idClient})">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                showAlert('Erreur lors du chargement des clients', 'danger');
+            }
+        }
+
+        // Actions des réservations
+        async function annulerReservation(id) {
+            if (!confirm('Voulez-vous vraiment annuler cette réservation ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/reservations/${id}/annuler`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    showAlert('Réservation annulée', 'success');
+                    loadClientReservations();
+                    if (userRole === 'gestionnaire') loadGestionnaireReservations();
+                } else {
+                    showAlert('Erreur lors de l\'annulation', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de l\'annulation', 'danger');
+            }
+        }
+
+        async function confirmerReservationGest(id) {
+            try {
+                const response = await fetch(`${API_BASE}/reservations/${id}/confirmer`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showAlert('Réservation confirmée', 'success');
+                    loadGestionnaireReservations();
+                } else {
+                    showAlert('Erreur lors de la confirmation', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la confirmation', 'danger');
+            }
+        }
+
+        async function annulerReservationGest(id) {
+            await annulerReservation(id);
+        }
+
+        async function terminerReservation(id) {
+            try {
+                const response = await fetch(`${API_BASE}/reservations/${id}/terminer`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showAlert('Réservation terminée', 'success');
+                    loadGestionnaireReservations();
+                } else {
+                    showAlert('Erreur lors de la finalisation', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la finalisation', 'danger');
+            }
+        }
+
+        async function supprimerReservation(id) {
+            if (!confirm('Voulez-vous vraiment supprimer cette réservation ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/reservations/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Réservation supprimée', 'success');
+                    loadGestionnaireReservations();
+                } else {
+                    showAlert('Erreur lors de la suppression', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Actions des chambres
+        function openChambreModal(chambre = null) {
+            editingChambre = chambre;
+            const modal = document.getElementById('chambre-modal');
+            const title = document.getElementById('chambre-modal-title');
+            const form = document.getElementById('chambre-form');
+            
+            if (chambre) {
+                title.textContent = 'Modifier la chambre';
+                document.getElementById('chambre-numero').value = chambre.numero;
+                document.getElementById('chambre-type').value = chambre.type;
+                document.getElementById('chambre-prix').value = chambre.prixNuit;
+                document.getElementById('chambre-disponible').checked = chambre.disponible;
+            } else {
+                title.textContent = 'Ajouter une chambre';
+                form.reset();
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeChambreModal() {
+            document.getElementById('chambre-modal').classList.remove('show');
+            editingChambre = null;
+        }
+
+        async function handleChambreForm(e) {
+            e.preventDefault();
+            
+            const formData = {
+                numero: document.getElementById('chambre-numero').value,
+                type: document.getElementById('chambre-type').value,
+                prixNuit: parseFloat(document.getElementById('chambre-prix').value),
+                disponible: document.getElementById('chambre-disponible').checked
+            };
+
+            try {
+                let response;
+                if (editingChambre) {
+                    response = await fetch(`${API_BASE}/chambres/${editingChambre.idChambre}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE}/chambres`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                if (response.ok) {
+                    showAlert(editingChambre ? 'Chambre modifiée' : 'Chambre ajoutée', 'success');
+                    closeChambreModal();
+                    loadGestionnaireChambres();
+                    loadChambresDisponibles();
+                } else {
+                    showAlert('Erreur lors de la sauvegarde', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la sauvegarde', 'danger');
+            }
+        }
+
+        async function editChambre(id) {
+            try {
+                const response = await fetch(`${API_BASE}/chambres/${id}`);
+                const chambre = await response.json();
+                openChambreModal(chambre);
+            } catch (error) {
+                showAlert('Erreur lors du chargement de la chambre', 'danger');
+            }
+        }
+
+        async function toggleDisponibiliteChambre(id, disponible) {
+            try {
+                const response = await fetch(`${API_BASE}/chambres/${id}/disponibilite?disponible=${disponible}`, {
+                    method: 'PUT'
+                });
+                
+                if (response.ok) {
+                    showAlert(`Chambre ${disponible ? 'activée' : 'désactivée'}`, 'success');
+                    loadGestionnaireChambres();
+                    loadChambresDisponibles();
+                } else {
+                    showAlert('Erreur lors de la modification', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la modification', 'danger');
+            }
+        }
+
+        async function supprimerChambre(id) {
+            if (!confirm('Voulez-vous vraiment supprimer cette chambre ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/chambres/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Chambre supprimée', 'success');
+                    loadGestionnaireChambres();
+                    loadChambresDisponibles();
+                } else {
+                    showAlert('Erreur lors de la suppression', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Actions des feedbacks
+        async function accepterFeedback(id) {
+            try {
+                // Dans un vrai système, vous auriez un endpoint pour accepter un feedback
+                // Pour l'instant, on simule juste une action réussie
+                showAlert('Feedback accepté', 'success');
+                loadGestionnaireFeedbacks();
+            } catch (error) {
+                showAlert('Erreur lors de l\'acceptation', 'danger');
+            }
+        }
+
+        async function supprimerFeedback(id) {
+            if (!confirm('Voulez-vous vraiment supprimer ce feedback ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/feedbacks/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Feedback supprimé', 'success');
+                    loadGestionnaireFeedbacks();
+                } else {
+                    showAlert('Erreur lors de la suppression', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Actions des clients
+        async function ajouterPoints(clientId) {
+            const points = prompt('Combien de points voulez-vous ajouter ?');
+            if (!points || isNaN(points)) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/clients/${clientId}/add-points?points=${points}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showAlert(`${points} points ajoutés`, 'success');
+                    loadGestionnaireClients();
+                } else {
+                    showAlert('Erreur lors de l\'ajout de points', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de l\'ajout de points', 'danger');
+            }
+        }
+
+        async function supprimerClient(id) {
+            if (!confirm('Voulez-vous vraiment supprimer ce client ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/clients/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Client supprimé', 'success');
+                    loadGestionnaireClients();
+                } else {
+                    showAlert('Erreur lors de la suppression', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la suppression', 'danger');
+            }
+        }
+
+        // Fonction utilitaire pour les alertes
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Fermer les modals en cliquant à l'extérieur
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Gestion des touches clavier
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    modal.classList.remove('show');
+                });
+            }
+        });
+
+        // Auto-refresh pour les gestionnaires (toutes les 30 secondes)
+        setInterval(() => {
+            if (userRole === 'gestionnaire' && document.getElementById('gestionnaire-section').classList.contains('active')) {
+                loadDashboardStats();
+                // Recharger seulement l'onglet actif pour éviter de surcharger
+                const activeTab = document.querySelector('#gestionnaire-section .nav-tab.active');
+                if (activeTab) {
+                    const tabName = activeTab.textContent.toLowerCase();
+                    if (tabName.includes('réservation')) {
+                        loadGestionnaireReservations();
+                    } else if (tabName.includes('chambre')) {
+                        loadGestionnaireChambres();
+                    } else if (tabName.includes('feedback')) {
+                        loadGestionnaireFeedbacks();
+                    } else if (tabName.includes('client')) {
+                        loadGestionnaireClients();
+                    }
+                }
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
